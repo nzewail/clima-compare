@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClimaCompare — Compare Weather Across Cities</title>
+  <meta name="description" content="Compare average monthly temperatures across cities worldwide. Beautiful, ad-free weather comparison charts." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Ccircle cx='16' cy='14' r='6' stroke='%236ea8fe' stroke-width='2'/%3E%3Cline x1='16' y1='4' x2='16' y2='6' stroke='%236ea8fe' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='16' y1='22' x2='16' y2='24' stroke='%236ea8fe' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='6' y1='14' x2='8' y2='14' stroke='%236ea8fe' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='24' y1='14' x2='26' y2='14' stroke='%236ea8fe' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='9.17' y1='7.17' x2='10.58' y2='8.58' stroke='%236ea8fe' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='21.42' y1='19.42' x2='22.83' y2='20.83' stroke='%236ea8fe' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='9.17' y1='20.83' x2='10.58' y2='19.42' stroke='%236ea8fe' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='21.42' y1='8.58' x2='22.83' y2='7.17' stroke='%236ea8fe' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M8 28c0-2 2-3 4-3s3 1.5 3 3' stroke='%236ea8fe' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M17 28c0-2 2-3 4-3s3 1.5 3 3' stroke='%236ea8fe' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="index.css?v=1800" />
+</head>
+<body>
+  <!-- Animated background orbs -->
+  <div class="bg-orb bg-orb--1"></div>
+  <div class="bg-orb bg-orb--2"></div>
+  <div class="bg-orb bg-orb--3"></div>
+
+  <div class="app">
+    <!-- Header -->
+    <header class="header" id="header">
+      <div class="header__brand">
+        <svg class="header__icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="14" r="6" stroke="currentColor" stroke-width="2"/>
+          <line x1="16" y1="4" x2="16" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="16" y1="22" x2="16" y2="24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="6" y1="14" x2="8" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="24" y1="14" x2="26" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="9.17" y1="7.17" x2="10.58" y2="8.58" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="21.42" y1="19.42" x2="22.83" y2="20.83" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="9.17" y1="20.83" x2="10.58" y2="19.42" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="21.42" y1="8.58" x2="22.83" y2="7.17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M8 28c0-2 2-3 4-3s3 1.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M17 28c0-2 2-3 4-3s3 1.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h1 class="header__title">ClimaCompare</h1>
+      </div>
+      <p class="header__subtitle">Compare 30-year climate normals (1995–2024 baseline) &amp; actual temperatures across cities</p>
+    </header>
+
+    <!-- Controls -->
+    <section class="controls" id="controls">
+      <div class="search-container">
+        <div class="search-box" id="search-box">
+          <svg class="search-box__icon" viewBox="0 0 20 20" fill="none">
+            <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="12.5" y1="12.5" x2="17" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <input
+            type="text"
+            class="search-box__input"
+            id="city-search"
+            placeholder="Search for a city..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div class="search-box__spinner" id="search-spinner"></div>
+        </div>
+        <div class="search-results" id="search-results"></div>
+      </div>
+
+      <div class="controls__row">
+        <div class="city-chips" id="city-chips">
+          <span class="city-chips__empty" id="chips-empty">Add cities to compare their climates</span>
+        </div>
+        <div class="actions-group">
+          <button class="share-btn" id="btn-share" title="Share comparison link">
+            <svg class="share-btn__icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13 3.5H16.5V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9.5 10.5L16 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M14 11V15.5C14 16.0523 13.5523 16.5 13 16.5H4.5C3.94772 16.5 3.5 16.0523 3.5 15.5V7C3.5 6.44772 3.94772 6 4.5 6H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Share
+          </button>
+          <div class="unit-toggle" id="unit-toggle">
+            <button class="unit-toggle__btn unit-toggle__btn--active" id="btn-fahrenheit" data-unit="F">°F</button>
+            <button class="unit-toggle__btn" id="btn-celsius" data-unit="C">°C</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- View mode + controls -->
+      <div class="view-controls" id="view-controls">
+        <div class="view-mode" id="view-mode">
+          <button class="view-mode__btn view-mode__btn--active" id="btn-monthly" data-mode="monthly">Monthly Trends</button>
+          <button class="view-mode__btn" id="btn-hourly" data-mode="hourly">Hourly Heatmap</button>
+          <button class="view-mode__btn" id="btn-trend" data-mode="trend">Warming Trend (1950–2026)</button>
+        </div>
+
+        <!-- Year selector (monthly mode) -->
+        <div class="year-selector" id="year-selector">
+          <span class="year-selector__label">Years:</span>
+          <div class="year-pills" id="year-pills"></div>
+        </div>
+
+        <!-- Month selector for Warming Trend mode -->
+        <div class="trend-month-selector" id="trend-month-selector" style="display:none;">
+          <span class="trend-month-selector__label">Trend Month:</span>
+          <div class="trend-month-pills" id="trend-month-pills"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chart Section (Line Chart for Monthly) -->
+    <section class="chart-section" id="chart-section">
+      <div class="chart-container" id="chart-container">
+        <div class="chart-empty" id="chart-empty">
+          <svg class="chart-empty__icon" viewBox="0 0 64 64" fill="none">
+            <rect x="8" y="12" width="48" height="40" rx="4" stroke="currentColor" stroke-width="2"/>
+            <polyline points="14,44 24,32 34,38 44,24 50,28" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="24" cy="32" r="2" fill="currentColor"/>
+            <circle cx="34" cy="38" r="2" fill="currentColor"/>
+            <circle cx="44" cy="24" r="2" fill="currentColor"/>
+          </svg>
+          <p class="chart-empty__text">Search and add cities above to see temperature comparisons</p>
+        </div>
+        <div class="chart-loading" id="chart-loading" style="display:none;">
+          <div class="chart-loading__spinner"></div>
+          <p class="chart-loading__text" id="loading-text">Loading weather data...</p>
+        </div>
+        <canvas id="temp-chart"></canvas>
+      </div>
+      <div class="chart-legend" id="chart-legend"></div>
+    </section>
+
+    <!-- Heatmap Section (Canvas/Grid Heatmap for Hourly) -->
+    <section class="heatmap-section" id="heatmap-section" style="display:none;">
+      <div class="heatmap-container" id="heatmap-container">
+        <!-- Rendered heatmap cards for each city will be placed here -->
+      </div>
+      <!-- Color Scale Legend -->
+      <div class="heatmap-legend" id="heatmap-legend">
+        <span class="heatmap-legend__label">Temperature:</span>
+        <div class="heatmap-legend__gradient"></div>
+        <div class="heatmap-legend__ticks" id="heatmap-legend-ticks"></div>
+      </div>
+    </section>
+
+    <!-- Data Table -->
+    <section class="data-section" id="data-section" style="display:none;">
+      <h2 class="data-section__title" id="data-section-title">Monthly Averages</h2>
+      <div class="table-scroll">
+        <table class="data-table" id="data-table">
+          <thead id="data-table-head"></thead>
+          <tbody id="data-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Data provided by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> ERA5 &middot; <strong>30-Year WMO Baseline:</strong> 1995 – 2024 &middot; <strong>Recent Actuals:</strong> 2025 – Present</p>
+    </footer>
+  </div>
+
+  <script src="app.js?v=100"></script>
+</body>
+</html>
